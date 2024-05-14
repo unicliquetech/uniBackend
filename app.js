@@ -32,6 +32,9 @@ const vendorRoutes = require('./src/routes/vendorAuthRoutes');
 // Use routes
 app.use('/api/v1/user', authRoutes);
 app.use('/api/v1/vendor', vendorRoutes);
+app.get('/', (req, res)=> {
+  res.send('HELLO BACKEND!')
+} )
 
 // Global error handling middleware
 // app.use(errorHandler);
