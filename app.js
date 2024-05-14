@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
+const cors = require('cors');
 const { errorHandler } = require('./src/utils/errorHandler');
 
 // Load environment variables
@@ -16,6 +17,13 @@ mongoose.connect(process.env.MONGODB_URI)
 
 // Middleware
 app.use(express.json());
+
+// Configure CORS
+app.use(cors({
+  origin: 'https://sign-up-login-seven.vercel.app/signin',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 // Routes
 const authRoutes = require('./src/routes/userAuthRoutes');
