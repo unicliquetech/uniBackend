@@ -19,11 +19,7 @@ mongoose.connect(process.env.MONGODB_URI)
 app.use(express.json());
 
 // Configure CORS
-app.use(cors({
-  origin: 'https://sign-up-login-seven.vercel.app/signin',
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+app.use(cors());
 
 // Routes
 const authRoutes = require('./src/routes/userAuthRoutes');
