@@ -85,27 +85,6 @@ passport.deserializeUser(async (id, done) => {
   }
 });
 
-// Register and Authenticate a user and generate a JWT
-const login = async (req, res, next) => {
-  passport.authenticate('local', { session: false }, (err, user, info) => {
-    if (err) {
-      return next(err);
-    }
-
-    if (!user) {
-      return res.status(401).json(info);
-    }
-
-    const payload = {
-      user: {
-        id: user.id,
-      },
-    };
-
-    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
-    res.json({ msg: `Welcome back, ${user.firstName}`, token });
-  })(req, res, next);
-};
 
 // Register a new user
 const registerUser = async (req, res, next) => {
@@ -117,8 +96,16 @@ const registerUser = async (req, res, next) => {
     const isValidPassword = validatePassword(password);
     const isValidConfirmPassword = validatePassword(confirmPassword);
 
-    if (!isValidEmail || !isValidPassword || !isValidConfirmPassword) {
-      return res.status(400).json({ msg: 'Invalid input' });
+    if (!isValidEmail) {
+      return res.status(400).json({ msg: 'Invalid email' });
+    }
+
+    if (!isValidPassword ) {
+      return res.status(400).json({ msg: 'Invalid password' });
+    }
+
+    if (!isValidConfirmPassword) {
+      return res.status(400).json({ msg: 'Invalid confirm' });
     }
 
     if (password !== confirmPassword) {
@@ -155,6 +142,7 @@ const registerUser = async (req, res, next) => {
       otp,
       otpExpires,
       isVerified: false,
+      role: 'user',
     });
 
      // Save the new user
@@ -198,6 +186,28 @@ const verifyEmail = async (req, res) => {
     console.error('Error verifying email:', error);
     res.status(500).json({ error: 'An error occurred' });
   }
+};
+
+// Authenticate a user and generate a JWT
+const login = async (req, res, next) => {
+  passport.authenticate('local', { session: false }, (err, user, info) => {
+    if (err) {
+      return next(err);
+    }
+
+    if (!user) {
+      return res.status(401).json(info);
+    }
+
+    const payload = {
+      user: {
+        id: user.id,
+      },
+    };
+
+    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
+    res.json({ msg: `Welcome back, ${user.firstName}`, token });
+  })(req, res, next);
 };
 
 // Reset Password Email

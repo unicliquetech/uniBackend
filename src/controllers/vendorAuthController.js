@@ -87,6 +87,7 @@ const vendorRegister = async (req, res) => {
         isVerified: false,
         otp,
         otpExpires,
+        role: 'vendor',
       });
   
       // Save the vendor data to the database
