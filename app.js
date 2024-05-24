@@ -20,6 +20,11 @@ app.use(express.json());
 
 // Configure CORS
 app.use(cors());
+<<<<<<< HEAD
+=======
+
+app.set('trust proxy', 1); // Trust the first proxy
+>>>>>>> 89baf17aaacb9aff8351417216cd385e4c730604
 
 // Routes
 const authRoutes = require('./src/routes/userAuthRoutes');
