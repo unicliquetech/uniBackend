@@ -41,6 +41,8 @@ passport.use(
     { usernameField: 'email' },
     async (email, password, done) => {
       try {
+        console.log('User email:', email);
+        console.log('User password:', password);
         // Find the user by email
         const user = await User.findOne({ email });
 
@@ -188,7 +190,7 @@ const verifyEmail = async (req, res) => {
   }
 };
 
-// Authenticate a user and generate a JWT
+// Login a user and generate a JWT
 const login = async (req, res, next) => {
   passport.authenticate('local', { session: false }, (err, user, info) => {
     if (err) {
@@ -200,12 +202,11 @@ const login = async (req, res, next) => {
     }
 
     const payload = {
-      user: {
-        id: user.id,
-      },
+      userId: user._id,
     };
 
-    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1d' });
+    res.setHeader('Authorization', `Bearer ${token}`);
     res.json({ msg: `Welcome back, ${user.firstName}`, token });
   })(req, res, next);
 };
@@ -397,6 +398,7 @@ const resetPasswordEmail = async (req, res, next) => {
     }
   };
 
+ 
 
   module.exports = { 
     login,
