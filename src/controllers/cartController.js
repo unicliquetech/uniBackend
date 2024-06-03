@@ -129,6 +129,7 @@ const updateCartItem = async (req, res) => {
   
     try {
       let cartId = localStorage.getItem('cartId');
+      
   
       // If there is no cartId in the localStorage, return an error
       if (!cartId) {
@@ -136,14 +137,15 @@ const updateCartItem = async (req, res) => {
       }
   
       // Find the existing cart based on the cartId
-      let cart = await CartData.findOne({ cartId });
+      let cart = await CartData.find({ cartId });
+      const cartItem = cart.find(item => item.productId === productId);
   
       if (!cart) {
         return res.status(404).json({ error: 'Cart not found.' });
       }
   
       // Remove the product from the cart
-      if (cart.productId === productId) {
+      if (cartItem.productId === productId) {
         // If the cart contains the product to be removed, delete the cart
         await CartData.deleteOne({ productId });
       } else {
