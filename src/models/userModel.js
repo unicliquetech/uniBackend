@@ -31,6 +31,9 @@ const UserSchema = new mongoose.Schema({
   otpExpires: {
     type: Date,
   },
+  resetOtpExpires: {
+    type: Date,
+  },
 });
 
 module.exports = mongoose.model("User", UserSchema);
