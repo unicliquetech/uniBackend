@@ -36,14 +36,22 @@ const sendVerificationEmail = async (email, businessName, ownerName, otp) => {
 const vendorRegister = async (req, res) => {
   try {
     const {
-      businessName,
-      businessDescription,
-      lastName,
-      firstName,
-      phoneNumber,
-      email,
-      password,
-      category,
+      ownerName,
+        businessName,
+        businessDescription,
+        businessType,
+        businessCategory,
+        location,
+        email,
+        phoneNumber,
+        university,
+        department,
+        matricNumber,
+        sex,
+        yearOfEntry,
+        dateOfBirth,
+        password,
+        confirmPassword,
     } = req.body;
 
     // Validate the email
@@ -61,8 +69,7 @@ const vendorRegister = async (req, res) => {
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Combine lastName and firstName
-    const ownerName = `${lastName} ${firstName}`;
+
   
       // Generate an OTP
       const generateOTP = () => {
@@ -77,13 +84,22 @@ const vendorRegister = async (req, res) => {
   
       // Create a new vendor document
       const newVendor = new Vendor({
+        ownerName,
         businessName,
         businessDescription,
-        ownerName,
-        phoneNumber,
+        businessType,
+        businessCategory,
+        location,
         email,
-        password: hashedPassword,
-        category,
+        phoneNumber,
+        university,
+        department,
+        matricNumber,
+        sex,
+        yearOfEntry,
+        dateOfBirth,
+        password,
+        confirmPassword,
         isVerified: false,
         otp,
         otpExpires,
@@ -96,7 +112,8 @@ const vendorRegister = async (req, res) => {
       // Send verification email
       sendVerificationEmail(email, businessName, ownerName, otp);
   
-      res.status(200).json({ message: 'Vendor registered successfully. Please verify your email.' });
+      res.setHeader('email', ` ${email}`);
+      res.status(200).json({ message: 'Vendor registered successfully. Please verify your email.', email });
     } catch (error) {
       console.error('Error registering vendor:', error);
       res.status(500).json({ error: 'An error occurred' });
@@ -143,18 +160,21 @@ const vendorRegister = async (req, res) => {
       const vendor = await Vendor.findOne({ email });
   
       if (!vendor) {
-        return res.status(400).json({ error: 'Invalid credentials' });
+        console.log("Not a vendor");
+        return res.status(404).json({ error: 'Invalid credentials' });
       }
   
       // Check if the vendor is verified
       if (!vendor.isVerified) {
+        console.log("verification issue");
         return res.status(400).json({ error: 'Please verify your email' });
       }
   
       // Compare the provided password with the hashed password
       const isPasswordValid = await bcrypt.compare(password, vendor.password);
   
-      if (!isPasswordValid) {
+      if (vendor.password !== password) {
+        console.log("encryption issue")
         return res.status(400).json({ error: 'Invalid credentials' });
       }
   
@@ -223,6 +243,7 @@ const vendorRegister = async (req, res) => {
   
       res.status(200).json({ message: 'Password reset email sent' });
     } catch (error) {
+      conssole.log(error);
       console.error('Error resetting password:', error);
       res.status(500).json({ error: 'An error occurred' });
     }
@@ -231,17 +252,13 @@ const vendorRegister = async (req, res) => {
   // Update password
   const updatePassword = async (req, res) => {
     try {
-      const { confirmPassword, resetOtp, password } = req.body;
-  
-      // Validate the email and password
-      const isValidEmail = validateEmail(email);
-  
-      if (!isValidEmail) {
-        return res.status(400).json({ error: 'Invalid input' });
-      }
+      const { confirmPassword, resetOtp, newPassword } = req.body;
+      console.log(resetOtp, confirmPassword, newPassword);
+
   
       // Check if the vendor exists
-      const vendor = await Vendor.findOne({ email });
+      const vendor = await Vendor.findOne({ resetOtp });
+      console.log(vendor);
       if (!vendor) {
         return res.status(404).json({ error: 'Vendor not found' });
       }
@@ -283,7 +300,7 @@ const vendorRegister = async (req, res) => {
   // Resend OTP
   const resendOTP = async (req, res) => {
     try {
-      const { email } = req.body;
+      let email = (req.headers.email);
   
       // Find the vendor by email
       const vendor = await Vendor.findOne({ email });
