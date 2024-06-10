@@ -1,0 +1,368 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+      "title": "My API",
+      "version": "1.0.0"
+    },
+    "paths": {
+      "/api/v1/user/register": {
+        "post": {
+          "summary": "Register a new user",
+          "responses": {
+            "200": {
+              "description": "Successful response"
+            }
+          }
+        }
+      },
+      "/api/v1/user/login": {
+        "post": {
+          "summary": "Login a user",
+          "responses": {
+            "200": {
+              "description": "Successful response"
+            }
+          }
+        }
+      },
+      "/api/v1/user/verify-email": {
+        "post": {
+          "summary": "Verify user email",
+          "responses": {
+            "200": {
+              "description": "Successful response"
+            }
+          }
+        }
+      },
+      "/api/v1/user/resend-otp": {
+        "post": {
+          "summary": "Resend OTP",
+          "responses": {
+            "200": {
+              "description": "Successful response"
+            }
+          }
+        }
+      },
+      "/api/v1/user/reset-password-email": {
+        "post": {
+          "summary": "Forgot password",
+          "responses": {
+            "200": {
+              "description": "Successful response"
+            }
+          }
+        }
+      },
+      "/api/v1/user/update-password": {
+        "post": {
+          "summary": "Update user password",
+          "responses": {
+            "200": {
+              "description": "Successful response"
+            }
+          }
+        }
+      },
+      "/api/v1/user/logout": {
+        "post": {
+          "summary": "Logout user",
+          "responses": {
+            "200": {
+              "description": "Successful response"
+            }
+          }
+        }
+      },
+      "/api/v1/vendor/register": {
+        "post": {
+          "summary": "Register a new vendor",
+          "responses": {
+            "200": {
+              "description": "Successful response"
+            }
+          }
+        }
+      },
+      "/api/v1/vendor/login": {
+        "post": {
+          "summary": "Login vendor",
+          "responses": {
+            "200": {
+              "description": "Successful response"
+            }
+          }
+        }
+      },
+      "/api/v1/vendor/verify-email": {
+        "get": {
+          "summary": "Verify vendor email",
+          "responses": {
+            "200": {
+              "description": "Successful response"
+            }
+          }
+        }
+      },
+      "/api/v1/vendor/resend-otp": {
+        "get": {
+          "summary": "Resend vendor otp",
+          "responses": {
+            "200": {
+              "description": "Successful response"
+            }
+          }
+        }
+      },
+      "/api/v1/vendor/reset-password": {
+        "get": {
+          "summary": "Reset vendor password",
+          "responses": {
+            "200": {
+              "description": "Successful response"
+            }
+          }
+        }
+      },
+      "/api/v1/vendor/update-password": {
+        "get": {
+          "summary": "Update vendor password",
+          "responses": {
+            "200": {
+              "description": "Successful response"
+            }
+          }
+        }
+      },
+      "/api/v1/vendor/logout": {
+        "get": {
+          "summary": "Logout vendor",
+          "responses": {
+            "200": {
+              "description": "Successful response"
+            }
+          }
+        }
+      },
+      "/api/v1/cart": {
+        "get": {
+          "summary": "List all cart items",
+          "responses": {
+            "200": {
+              "description": "Successful response"
+            }
+          }
+        },
+        "post": {
+          "summary": "Add new cart items",
+          "responses": {
+            "200": {
+              "description": "Successful response"
+            }
+          }
+        }
+      },
+      "/api/v1/cart/:productId": {
+        "put": {
+          "summary": "Update items",
+          "responses": {
+            "200": {
+              "description": "Successful response"
+            }
+          }
+        },
+        "delete": {
+          "summary": "Delete cart items",
+          "responses": {
+            "200": {
+              "description": "Successful response"
+            }
+          }
+        }
+      },
+      "/api/v1/product": {
+        "get": {
+          "summary": "List all product items",
+          "responses": {
+            "200": {
+              "description": "Successful response"
+            }
+          }
+        },
+        "post": {
+          "summary": "Add new product items",
+          "responses": {
+            "200": {
+              "description": "Successful response"
+            }
+          }
+        }
+      },
+      "/api/v1/product/:id": {
+        "get": {
+          "summary": "Get single product",
+          "responses": {
+            "200": {
+              "description": "Successful response"
+            }
+          }
+        },
+        "patch": {
+          "summary": "Update single product",
+          "responses": {
+            "200": {
+              "description": "Successful response"
+            }
+          }
+        },
+        "delete": {
+          "summary": "Delete single product",
+          "responses": {
+            "200": {
+              "description": "Successful response"
+            }
+          }
+        }
+      },
+      "/api/v1/product/uploadImage": {
+        "post": {
+          "summary": "Upload product image",
+          "responses": {
+            "200": {  
+              "description": "Successful response"
+            }
+          }
+        }
+      },
+      "/api/v1/address": {
+        "get": {
+          "summary": "Get user address",
+          "responses": {
+            "200": {  
+              "description": "Successful response"
+            }
+          }
+        },
+        "post": {
+          "summary": "Add new user address",
+          "responses": {
+            "200": {  
+              "description": "Successful response"
+            }
+          }
+        }
+      },
+      "/api/v1/address/:id": {
+        "put": {
+          "summary": "Update user address",
+          "responses": {
+            "200": {  
+              "description": "Successful response"
+            }
+          }
+        },
+        "delete": {
+          "summary": "Delete user address",
+          "responses": {
+            "200": {  
+              "description": "Successful response"
+            }
+          }
+        }
+      },
+      "/api/v1/deliveryPersonnel": {
+        "get": {
+          "summary": "Get all delivery personnels",
+          "responses": {
+            "200": {  
+              "description": "Successful response"
+            }
+          }
+        },
+        "post": {
+            "summary": "Add new delivery personnel",
+            "responses": {
+              "200": {  
+                "description": "Successful response"
+              }
+            }
+          }
+      }
+    },
+    "/api/v1/deliveryPersonnel/:id": {
+        "get": {
+          "summary": "Get specific delivery personnel",
+          "responses": {
+            "200": {  
+              "description": "Successful response"
+            }
+          }
+        },
+        "put": {
+            "summary": "Update delivery personnel infomation",
+            "responses": {
+              "200": {  
+                "description": "Successful response"
+              }
+            }
+          }
+      },
+      "/api/v1/deliveryPersonnel/filter": {
+        "get": {
+          "summary": "Filter delivery personnel",
+          "responses": {
+            "200": {  
+              "description": "Successful response"
+            }
+          }
+        }
+    },
+    "/api/v1/order": {
+        "get": {
+          "summary": "Get all orders",
+          "responses": {
+            "200": {  
+              "description": "Successful response"
+            }
+          }
+        },
+        "post": {
+            "summary": "Add new order",
+            "responses": {
+              "200": {  
+                "description": "Successful response"
+              }
+            }
+          }
+      },
+      "/api/v1/order:id": {
+        "get": {
+          "summary": "Get specific order",
+          "responses": {
+            "200": {  
+              "description": "Successful response"
+            }
+          }
+        },
+        "patch": {
+            "summary": "Update order information",
+            "responses": {
+              "200": {  
+                "description": "Successful response"
+              }
+            }
+          }
+      },
+      "/api/v1/order/showAllMyOrders": {
+        "get": {
+          "summary": "Show all user orders",
+          "responses": {
+            "200": {  
+              "description": "Successful response"
+            }
+          }
+        }
+      }
+  }
+

@@ -12,6 +12,12 @@ const rateLimiter = require('express-rate-limit');
 const helmet  = require('helmet');
 const xss = require('xss-clean');
 const mongoSanitize = require('express-mongo-sanitize');
+const swaggerUi = require('swagger-ui-express');
+const yaml = require('yaml');
+const fs = require('fs');
+
+const swaggerDocument = yaml.parse(fs.readFileSync('./swagger.json', 'utf8'));
+
 
 // USE V2
 const cloudinary = require('cloudinary').v2;
@@ -51,6 +57,7 @@ app.use(express.json());
 app.use(cookieParser(process.env.JWT_SECRET));
 app.use(fileUpload({ useTempFiles: true }));
 // app.use(handleTokenExpiration);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI)
@@ -67,6 +74,9 @@ const vendorRoutes = require('./src/routes/vendorAuthRoutes');
 const cartRoutes = require('./src/routes/cartRoute');
 const productsRoutes = require('./src/routes/productsRoutes');
 const addressRoutes = require('./src/routes/addressRoutes');
+const deliveryPersonnelRoutes = require('./src/routes/deliveryPersonnelRoutes');
+const messageRoutes = require('./src/routes/messageRoutes');
+// const ordersRoutes = require('./src/routes/ordersRoutes');
 
 // Use routes
 app.use('/api/v1/user', authRoutes);
@@ -74,8 +84,15 @@ app.use('/api/v1/vendor', vendorRoutes);
 app.use('/api/v1/cart', cartRoutes);
 app.use('/api/v1/products', productsRoutes);
 app.use('/api/v1/address', addressRoutes);
+app.use('/api/v1/deliveryPersonnel', deliveryPersonnelRoutes);
+app.use('/api/v1/message', messageRoutes);
+// app.use('/api/v1/order', ordersRoutes);
 app.get('/', (req, res)=> {
   res.send('HELLO BACKEND!')
+} )
+
+app.get('/order', (req, res)=> {
+  res.send('HELLO ORDER!')
 } )
 
 // Global error handling middleware

@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const { JWT_SECRET } = require('../config/env');
 const { scryptSync } = require('crypto');
 
-const authenticateToken = (req, res, next) => {
+const authenticateUser = (req, res, next) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
 
@@ -40,4 +40,18 @@ const authenticateToken = (req, res, next) => {
   }
 };
 
-module.exports = authenticateToken;
+const authorizePermissions = (...roles) => {
+  return (req, res, next) => {
+      if (!roles.includes(req.user.role)){
+          throw new CustomError.UnauthorizedError(
+              'Unauthorized to access this route'
+          );
+      }
+      next();
+  };
+};
+
+module.exports = {
+  authenticateUser,
+  authorizePermissions,
+}
