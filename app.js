@@ -8,6 +8,7 @@ const { errorHandler } = require('./src/utils/errorHandler');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const fileUpload = require('express-fileupload');
+const { createProxyMiddleware } = require('http-proxy-middleware');
 const rateLimiter = require('express-rate-limit');
 const helmet  = require('helmet');
 const xss = require('xss-clean');
@@ -58,6 +59,14 @@ app.use(cookieParser(process.env.JWT_SECRET));
 app.use(fileUpload({ useTempFiles: true }));
 // app.use(handleTokenExpiration);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+// Proxy route for WhatsApp API
+app.use('/whatsapp', createProxyMiddleware({
+  target: 'https://api.whatsapp.com',
+  changeOrigin: true,
+  pathRewrite: {
+    '^/whatsapp': '', // Remove '/whatsapp' from the request path
+  },
+}));
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI)
@@ -76,7 +85,9 @@ const productsRoutes = require('./src/routes/productsRoutes');
 const addressRoutes = require('./src/routes/addressRoutes');
 const deliveryPersonnelRoutes = require('./src/routes/deliveryPersonnelRoutes');
 const messageRoutes = require('./src/routes/messageRoutes');
-// const ordersRoutes = require('./src/routes/ordersRoutes');
+const ordersRoutes = require('./src/routes/ordersRoutes');
+const vendorProfileRoutes = require('./src/routes/vendorsRoutes');
+
 
 // Use routes
 app.use('/api/v1/user', authRoutes);
@@ -86,7 +97,8 @@ app.use('/api/v1/products', productsRoutes);
 app.use('/api/v1/address', addressRoutes);
 app.use('/api/v1/deliveryPersonnel', deliveryPersonnelRoutes);
 app.use('/api/v1/message', messageRoutes);
-// app.use('/api/v1/order', ordersRoutes);
+app.use('/api/v1/order', ordersRoutes);
+app.use('/api/v1/vendorProfile', vendorProfileRoutes)
 app.get('/', (req, res)=> {
   res.send('HELLO BACKEND!')
 } )
@@ -97,6 +109,23 @@ app.get('/order', (req, res)=> {
 
 // Global error handling middleware
 // app.use(errorHandler);
+
+// Assuming this is at the end of your routes file
+app.use((req, res, next) => {
+  const error = new Error('Route not found');
+  error.status = 404;
+  next(error);
+});
+
+// Error handler middleware
+app.use((error, req, res, next) => {
+  res.status(error.status || 500);
+  res.json({
+    error: {
+      message: error.message
+    }
+  });
+});
 
 // Start the server
 const PORT = process.env.PORT || 5000;

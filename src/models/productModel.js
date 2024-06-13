@@ -17,10 +17,18 @@ const ProductSchema = new mongoose.Schema(
       maxlength: [100, "Name can not be more than 100 characters"],
     },
     price: {
-      type: Number,
-      required: [true, "Please provide product price"],
-      default: 0,
-    },
+        type: Number,
+        required: [true, "Please provide base product price"],
+        default: 0,
+      },
+    discountPrice: {
+        type: Number,
+        default: 0,
+      },
+    refund: {
+        type: Boolean,
+        default: false,
+      },
     description: {
       type: String,
       required: [true, "Please provide product description"],
@@ -33,33 +41,32 @@ const ProductSchema = new mongoose.Schema(
     category: {
       type: String,
       required: [true, "Please provide product category"],
-      enum: ["skincare", "stationery", "snacks", "cakes", "fastfood", "facecare", "haircare", "footwear"],
+      enum: ["skincare", "stationery", "snacks", "cakes", "fastfood", "facecare", "haircare", "footwear", "gadgets",],
     },
-    company: {
+    subcategory: {
       type: String,
-      required: [true, "Please provide company"],
     },
-    colors: {
+    vendorId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Vendor',
+      required: true,
+    },
+    vendorlogo: {
+      type: String,
+    },
+    colours: {
       type: [String],
       default: ["#222"],
       required: true,
     },
-    featured: {
+    sponsored: {
       type: Boolean,
       default: false,
     },
-    deliveryTime: {
-      type: [Number],
-      required: true,
-    },
-    deliveryNote: {
+    shipping: {
       type: String,
-      enum: ["Delivery Charges Apply", "Free Delivery"],
+      enum: ['regular', 'express', 'schedule'],
       required: true,
-    },
-    freeShipping: {
-      type: Boolean,
-      default: false,
     },
     rating: {
       type: Number,
@@ -69,14 +76,35 @@ const ProductSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    // user: {
+    brand: {
+      type: String,
+    },
+    deliveryTime: {
+      type: String,
+    },
+    deliveryNote: {
+      type: String,
+    },
+    gender: {
+      type: String,
+      enum: ['male', 'female', 'unisex'],
+    },
+    stockNumber: {
+      type: Number,
+      required: true,
+    },
+  },
+  { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
+);
+
+module.exports = mongoose.model("Product", ProductSchema);
+
+
+// user: {
     //   type: mongoose.Types.ObjectId,
     //   ref: "User",
     //   required: true,
     // },
-  },
-  { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
-);
 
 // ProductSchema.virtual("reviews", {
 //   ref: "Review",
@@ -88,5 +116,3 @@ const ProductSchema = new mongoose.Schema(
 // ProductSchema.pre("remove", async function (next) {
 //   await this.model("Review").deleteMany({ product: this._id });
 // });
-
-module.exports = mongoose.model("Product", ProductSchema);

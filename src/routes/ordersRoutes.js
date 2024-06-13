@@ -13,6 +13,12 @@ const {
 router.route("/")
       .post( createOrder)
       .get(getAllOrders);
+      
+router.route('/:id')
+      .get( getSingleOrder);
+
+router.route('/:orderId/status')
+      .patch( updateOrder);
 
 router.route('/showAllMyOrders')
       .get( getCurrentUserOrders);

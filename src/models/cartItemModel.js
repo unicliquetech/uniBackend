@@ -39,6 +39,10 @@ const CartSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    deliveryTime: {
+      type: [Number],
+      default: false,
+    },
   });
    
   

@@ -41,7 +41,7 @@ const getCart = async (req, res) => {
 
 // Middleware to add a new item to the cart
 const addCartItem = async (req, res, next) => {
-  const { productId, quantity, image, name, price, colors, freeShipping } = req.body;
+  const { productId, quantity, image, name, price, colors, freeShipping, deliveryTime } = req.body;
   try {
     let cart;
     let cartId = localStorage.getItem('cartId'); // Get the cartId from the localStorage
@@ -64,6 +64,7 @@ const addCartItem = async (req, res, next) => {
         productId,
         colors,
         freeShipping,
+        deliveryTime,
       });
     } else {
       // If the product already exists in the cart, update its quantity
@@ -80,6 +81,7 @@ const addCartItem = async (req, res, next) => {
           productId,
           colors,
           freeShipping,
+          deliveryTime,
         });
         await newProduct.save();
       }

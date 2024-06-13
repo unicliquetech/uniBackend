@@ -10,15 +10,20 @@ const {
   updateProduct,
   deleteProduct,
   uploadImage,
+  getProductsByVendor,
 //   createProductWithImage,
 } = require("../controllers/productsController");
 
-router.route("/")
-    .post(createProduct)
-    .get(getAllProducts);
 
-router.route('/uploadImage')
-    .post(uploadImage);
+router.route("/:vendorId")
+    .get(getProductsByVendor);
+
+router.route("/")
+    .get(getAllProducts)
+    .post(createProduct);
+
+    // const uploadSingle = upload.single('image');
+router.post('/uploadImage', uploadImage);
     
 router.route("/:id")
     .get(getSingleProduct)
