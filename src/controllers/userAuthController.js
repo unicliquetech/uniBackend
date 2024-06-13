@@ -41,24 +41,21 @@ passport.use(
     { usernameField: 'email' },
     async (email, password, done) => {
       try {
-        console.log('User email:', email);
-        console.log('User password:', password);
+        // console.log('User email:', email);
+        // console.log('User password:', password);
         // Find the user by email
         const user = await User.findOne({ email });
 
-        console.log('User found:', user);
+        // console.log('User found:', user);
 
         // If no user is found, return false
         if (!user) {
-          console.log(user);
           return done(null, false, { message: 'Invalid email' });
         }
 
         // Check if the password is correct
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
-          console.log(user.password);
-          console.log(password);
           return done(null, false, { message: 'Invalid password' });
         }
 
@@ -93,9 +90,7 @@ passport.deserializeUser(async (id, done) => {
 
 // Register a new user
 const registerUser = async (req, res, next) => {
-  console.log("received");
   const { firstName, lastName, email, phoneNumber, password, confirmPassword } = req.body;
-  console.log(req.body);
   
   try {
     // Validate input
@@ -170,7 +165,6 @@ const registerUser = async (req, res, next) => {
 const verifyEmail = async (req, res) => {
   try {
     const { otp } = req.body;
-    console.log(otp);
 
      // Find the vendor by the OTP
      const user = await User.findOne({ otp });
@@ -207,7 +201,6 @@ const login = async (req, res, next) => {
 
 
     if (!user) {
-      console.log(user);
       return res.status(401).json(info);
     }
 
@@ -231,7 +224,6 @@ const resetPasswordEmail = async (req, res, next) => {
 
     // Check if the user exists
     const user = await User.findOne({ email });
-    console.log(user);
     if (!user) {
       return res.status(404).json({ msg: 'User not found' });
     }
@@ -281,11 +273,9 @@ const resetPasswordEmail = async (req, res, next) => {
   // Update Password
   const updatePassword = async (req, res, next) => {
     const { resetOtp, newPassword, confirmPassword } = req.body;
-    console.log(resetOtp);
   
     try {
       if (newPassword !== confirmPassword) {
-        console.log(newPassword, confirmPassword);
         return res.status(400).json({ msg: 'Passwords do not match' });
       }
   
@@ -297,9 +287,6 @@ const resetPasswordEmail = async (req, res, next) => {
   
       // Verify the reset token and expiration time
       if (!user.resetOtp || user.resetOtp != resetOtp ) {
-        // console.log('resetOtp:', resetOtp, 'type:', typeof resetOtp);
-        // console.log('user.resetOtp:', user.resetOtp, 'type:', typeof user.resetOtp);
-        // console.log(user);
         return res.status(400).json({ msg: 'Invalid or expired otp' });
       }
   
@@ -312,9 +299,6 @@ const resetPasswordEmail = async (req, res, next) => {
       user.resetOtp = null;
       user.resetOtpExpires = null;
       await user.save();
-
-      console.log(hashedPassword);
-      console.log(newPassword);
   
       res.json({ msg: 'Password updated successfully' });
     } catch (err) {
@@ -325,7 +309,6 @@ const resetPasswordEmail = async (req, res, next) => {
   // Logout
   const logoutUser = async (req, res, next) => {
     try {
-      // Clear the JWT token from the client
       res.clearCookie('token');
   
       res.json({ msg: 'Logged out successfully' });

@@ -15,22 +15,18 @@ exports.getVendorProfile = async (req, res) => {
     }
 
     const vendorId = vendor._id;
-    console.log(vendorId);
 
     const products = await Product.find({ vendorId });
     const orders = await Order.find({ vendorId });
-    const name = vendor.ownerName;
-    const email = vendor.email;
-
-    // console.log('Name:', name); 
-    // console.log('Email:', email); 
+    // const name = vendor.ownerName;
+    // const email = vendor.email;
 
     res.status(200).json({
       vendor,
       products,
       orders,
-      name,
-      email,
+      // name,
+      // email,
     });
   } catch (error) {
     console.error(error);

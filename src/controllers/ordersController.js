@@ -38,10 +38,7 @@ const createOrder = async (req, res) => {
     const productId = (item.productId);
     // const deliveryTime = (item.deliveryTime);
     const dbProduct = await Product.findOne({ productId });
-    // const deliveryTime = await Product.findOne( {orderDeliveryTime} );
 
-    console.log(productId);
-    // console.log(orderDeliveryTime);
 
     if (!dbProduct) {
       throw new CustomError.NotFoundError(`No product with id : ${productId}`);
@@ -230,8 +227,6 @@ const getCurrentUserOrders = async (req, res) => {
 const updateOrder = async (req, res) => {
   const { orderId } = req.params;
   const { orderStatus } = req.body;
-
-  console.log(orderId, orderStatus);
 
   try {
     const order = await Order.findOneAndUpdate(

@@ -160,13 +160,11 @@ const vendorRegister = async (req, res) => {
       const vendor = await Vendor.findOne({ email });
   
       if (!vendor) {
-        console.log("Not a vendor");
         return res.status(404).json({ error: 'Invalid credentials' });
       }
   
       // Check if the vendor is verified
       if (!vendor.isVerified) {
-        console.log("verification issue");
         return res.status(400).json({ error: 'Please verify your email' });
       }
   
@@ -174,7 +172,6 @@ const vendorRegister = async (req, res) => {
       const isPasswordValid = await bcrypt.compare(password, vendor.password);
   
       if (vendor.password !== password) {
-        console.log("encryption issue")
         return res.status(400).json({ error: 'Invalid credentials' });
       }
   
@@ -258,7 +255,6 @@ const vendorRegister = async (req, res) => {
   
       // Check if the vendor exists
       const vendor = await Vendor.findOne({ resetOtp });
-      console.log(vendor);
       if (!vendor) {
         return res.status(404).json({ error: 'Vendor not found' });
       }

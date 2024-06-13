@@ -65,7 +65,6 @@ const createProduct = async (req, res) => {
     });
 
     const savedProduct = await newProduct.save();
-    console.log(savedProduct);
     res.status(201).json(savedProduct);
   } catch (error) {
     console.error("Error creating product:", error);
@@ -148,8 +147,6 @@ const uploadImage = async (req, res) => {
     folder: "file-upload",
   });
 
-  console.log(result.secure_url);
-
   // Remove the temporary file from the server
   fs.unlinkSync(file.tempFilePath);
 
@@ -157,9 +154,7 @@ const uploadImage = async (req, res) => {
 };
 
 const getProductsByVendor = async (req, res) => {
-    console.log(req.params.vendorId);
     const vendorEmail  = (req.params.vendorId);
-    console.log(vendorEmail);
     const vendor = await Vendor.findOne({ email: vendorEmail });
 
     if (vendor) {
