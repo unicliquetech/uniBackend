@@ -37,16 +37,21 @@ cloudinary.config({
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+
+const allowedOrigins = ['http://localhost:3000', 'https://uni-frontend-theta.vercel.app'];
+
+app.use(cors({
+  origin: allowedOrigins
+}));
 // Configure cookie-parser middleware
 app.use(cookieParser(process.env.JWT_SECRET));
 // Configure express-session middleware
 app.use(
   session({
-    secret: 'ycfw729910jhy&^%£GCXD143ft42((DRfr3Frk8', // Replace with a strong secret key
+    secret: 'ycfw729910jhy&^%£GCXD143ft42((DRfr3Frk8', 
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: true } // Set secure to true if using HTTPS
+    cookie: { secure: true }
   })
 );
 app.use(helmet());
@@ -64,7 +69,7 @@ app.use('/whatsapp', createProxyMiddleware({
   target: 'https://api.whatsapp.com',
   changeOrigin: true,
   pathRewrite: {
-    '^/whatsapp': '', // Remove '/whatsapp' from the request path
+    '^/whatsapp': '', 
   },
 }));
 
