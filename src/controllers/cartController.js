@@ -16,7 +16,7 @@ const getCartItem = async (req, res) => {
   }
 
   try {
-    const cartData = await CartData.findOne({ cartId });
+    let cartData = await CartData.findOne({ cartId });
 
     if (!cartData) {
       const newCartId = crypto.randomBytes(16).toString('hex');
