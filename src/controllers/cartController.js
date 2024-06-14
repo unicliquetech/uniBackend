@@ -7,7 +7,34 @@ const getNewCartId = () => {
   return crypto.randomBytes(16).toString('hex');
 };
 
+const getCartItem = async (req, res) => {
+  const { cartId } = req.body;
 
+  // Check if cartId is provided
+  if (!cartId) {
+    return res.status(400).json({ error: 'cartId is required' });
+  }
+
+  try {
+    const cartData = await CartData.findOne({ cartId });
+
+    if (!cartData) {
+      const newCartId = crypto.randomBytes(16).toString('hex');
+
+      cartData = new CartData({ cartId: newCartId, items: [] });
+      await cartData.save();
+
+      console.log(cartData);
+      return res.status(201).json({ cartId: newCartId });
+    }
+
+    // Return the cart items
+    res.json(cartData);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
 
 const getCart = async (req, res) => {
   try {
@@ -162,44 +189,6 @@ const updateCartItem = async (req, res) => {
     }
   };
 
-// Route to get the cartId from the database
-// const getCartId = async (req, res) => {
-//   try {
-//     // Retrieve the cartId from the database
-//     const cart = await CartModel.findOne({}, { cartId: 1 });
-
-//     if (cart) {
-//       res.json({ cartId: cart.cartId });
-//     } else {
-//       res.status(404).json({ error: 'No cart found' });
-//     }
-//   } catch (error) {
-//     console.error('Error retrieving cartId:', error);
-//     res.status(500).json({ error: 'Internal server error' });
-//   }
-// };
-
-// // Route to create or update a cart in the database
-// const createCartId = async (req, res) => {
-//   try {
-//     const { cartId } = req.body;
-
-//     // Check if a cart with the provided cartId already exists
-//     let cart = await CartModel.findOne({ cartId });
-
-//     if (!cart) {
-//       // If no cart exists, create a new one
-//       cart = new CartModel({ cartId });
-//       await cart.save();
-//     }
-
-//     res.status(200).json({ message: 'Cart created or updated successfully' });
-//   } catch (error) {
-//     console.error('Error creating or updating cart:', error);
-//     res.status(500).json({ error: 'Internal server error' });
-//   }
-// };
-
 
 
 module.exports = {
@@ -207,6 +196,6 @@ module.exports = {
   getCart,
   updateCartItem,
   deleteCartItem,
-  // getCartId,
+  getCartItem,
   // createCartId,
 };
