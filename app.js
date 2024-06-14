@@ -38,10 +38,10 @@ cloudinary.config({
 const app = express();
 app.use(express.json());
 
-const allowedOrigins = ['http://localhost:3000', 'https://uni-frontend-theta.vercel.app'];
+// const allowedOrigins = ['http://localhost:3000', 'https://uni-frontend-theta.vercel.app'];
 
 app.use(cors({
-  origin: allowedOrigins
+  origin: 'https://uni-frontend-theta.vercel.app'
 }));
 // Configure cookie-parser middleware
 app.use(cookieParser(process.env.JWT_SECRET));
