@@ -16,9 +16,9 @@ const mongoSanitize = require('express-mongo-sanitize');
 const swaggerUi = require('swagger-ui-express');
 const yaml = require('yaml');
 const fs = require('fs');
-const redis = require('redis');
-const session = require('express-session');
-const RedisStore = require('connect-redis')(session);
+// const redis = require('redis');
+// const session = require('express-session');
+// const RedisStore = require('connect-redis')(session);
 
 const swaggerDocument = yaml.parse(fs.readFileSync('./swagger.json', 'utf8'));
 
@@ -66,14 +66,14 @@ const redisClient = redis.createClient({
   port: 6379,
 });
 
-app.use(
-  session({
-    store: new RedisStore({ client: redisClient }),
-    secret: 'your-secret-key', 
-    resave: false,
-    saveUninitialized: true,
-  })
-);
+// app.use(
+//   session({
+//     store: new RedisStore({ client: redisClient }),
+//     secret: 'your-secret-key', 
+//     resave: false,
+//     saveUninitialized: true,
+//   })
+// );
 
 // middleware
 app.use(express.json());
