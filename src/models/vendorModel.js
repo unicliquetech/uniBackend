@@ -46,14 +46,25 @@ const vendorSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  bank: {
+    type: String,
+    required: true,
+  },
+  accountNumber: {
+    type: String,
+    required: true,
+  },
+  accountName: {
+    type: String,
+    required: true,
+  },
   university: {
     type: String,
   },
   department: {
     true: String,
   },
-  matricNumber: {
-  },
+  matricNumber: {},
   dateOfBirth: {
     true: Date,
   },
