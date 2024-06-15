@@ -61,10 +61,10 @@ app.use(helmet());
 app.use(xss());
 app.use(mongoSanitize());
 
-const redisClient = redis.createClient({
-  host: 'your-redis-host',
-  port: 6379,
-});
+// const redisClient = redis.createClient({
+//   host: 'your-redis-host',
+//   port: 6379,
+// });
 
 // app.use(
 //   session({
