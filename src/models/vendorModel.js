@@ -34,6 +34,18 @@ const vendorSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  location: {
+    type: String,
+    required: true,
+  },
+  openingHours: {
+    type: String,
+    required: true,
+  },
+  closingHours: {
+    type: String,
+    required: true,
+  },
   university: {
     type: String,
   },
@@ -63,6 +75,9 @@ const vendorSchema = new mongoose.Schema({
   },
   otpExpires: {
     type: Date,
+  },
+  role: {
+    type: String,
   },
 });
 

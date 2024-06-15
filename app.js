@@ -16,6 +16,9 @@ const mongoSanitize = require('express-mongo-sanitize');
 const swaggerUi = require('swagger-ui-express');
 const yaml = require('yaml');
 const fs = require('fs');
+const redis = require('redis');
+const session = require('express-session');
+const RedisStore = require('connect-redis')(session);
 
 const swaggerDocument = yaml.parse(fs.readFileSync('./swagger.json', 'utf8'));
 
@@ -46,17 +49,31 @@ app.use(cors({
 // Configure cookie-parser middleware
 app.use(cookieParser(process.env.JWT_SECRET));
 // Configure express-session middleware
-app.use(
-  session({
-    secret: 'ycfw729910jhy&^%£GCXD143ft42((DRfr3Frk8', 
-    resave: false,
-    saveUninitialized: true,
-    cookie: { secure: true }
-  })
-);
+// app.use(
+//   session({
+//     secret: 'ycfw729910jhy&^%£GCXD143ft42((DRfr3Frk8', 
+//     resave: false,
+//     saveUninitialized: true,
+//     cookie: { secure: true }
+//   })
+// );
 app.use(helmet());
 app.use(xss());
 app.use(mongoSanitize());
+
+const redisClient = redis.createClient({
+  host: 'your-redis-host',
+  port: 6379,
+});
+
+app.use(
+  session({
+    store: new RedisStore({ client: redisClient }),
+    secret: 'your-secret-key', 
+    resave: false,
+    saveUninitialized: true,
+  })
+);
 
 // middleware
 app.use(express.json());
