@@ -90,6 +90,9 @@ const vendorSchema = new mongoose.Schema({
   role: {
     type: String,
   },
+  // rating: { type: Number, default: 0 },
+  // numReviews: { type: Number, default: 0 },
+  // reviews: [reviewSchema],
 });
 
 module.exports = mongoose.model("Vendor", vendorSchema);

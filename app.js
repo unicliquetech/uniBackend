@@ -44,7 +44,7 @@ app.use(express.json());
 // const allowedOrigins = ['http://localhost:3000', 'https://uni-frontend-theta.vercel.app'];
 
 app.use(cors({
-  origin: 'https://uni-frontend-theta.vercel.app'
+  origin: 'https://uniclique.com.ng'
 }));
 // Configure cookie-parser middleware
 app.use(cookieParser(process.env.JWT_SECRET));
