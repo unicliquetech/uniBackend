@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const Review = require('../models/reviewModel');
 
 const vendorSchema = new mongoose.Schema({
   businessName: {
@@ -90,9 +91,18 @@ const vendorSchema = new mongoose.Schema({
   role: {
     type: String,
   },
-  // rating: { type: Number, default: 0 },
-  // numReviews: { type: Number, default: 0 },
-  // reviews: [reviewSchema],
+  rating: { 
+    type: Number, 
+    default: 0 
+  },
+  numReviews: { 
+    type: Number, 
+    default: 0 
+  },
+  reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Review' }],
 });
 
-module.exports = mongoose.model("Vendor", vendorSchema);
+// module.exports = mongoose.model("Vendor", vendorSchema);
+const Vendor = mongoose.model('Vendor', vendorSchema);
+
+module.exports = Vendor;

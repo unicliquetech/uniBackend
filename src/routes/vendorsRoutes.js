@@ -1,12 +1,20 @@
 const express = require('express');
 const router = express.Router();
-const vendorProfileController = require('../controllers/vendorsController');
+const {
+    getVendorProfile,
+  fetchVendorData,
+  submitReview,
+  updateReview,
+  deleteReview,
+  authenticateToken,
+} = require('../controllers/vendorsController');
 
-router.post('/', vendorProfileController.getVendorProfile);
-// app.get('/api/v1/vendorPage/:vendorName')
-// app.post('/api/v1/vendorPage/:vendorName/reviews', authenticateToken,)
-// app.put('/api/v1/vendorPage/:vendorName/reviews/:reviewId', authenticateToken,)
-// app.delete('/api/v1/vendorPage/:vendorName/reviews/:reviewId', authenticateToken,)
+router.post('/', getVendorProfile);
+router.get('/vendorPage/:businessName', fetchVendorData)
+router.post('/vendorPage/:businessName/auth', authenticateToken)
+router.post('/vendorPage/:businessName/reviews', authenticateToken, submitReview)
+router.put('/vendorPage/:vendorName/reviews/:reviewId', authenticateToken, updateReview)
+router.delete('/vendorPage/:vendorName/reviews/:reviewId', authenticateToken, deleteReview)
 
 
 module.exports = router;
