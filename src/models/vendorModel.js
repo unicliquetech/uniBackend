@@ -93,7 +93,10 @@ const vendorSchema = new mongoose.Schema({
   },
   rating: { 
     type: Number, 
-    default: 0 
+    default: 0,
+    min: 0,
+    max: 5,
+    set: v => Math.round(v * 100) / 100 
   },
   numReviews: { 
     type: Number, 
