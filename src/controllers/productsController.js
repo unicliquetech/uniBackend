@@ -73,8 +73,7 @@ const createProduct = async (req, res) => {
 };
 
 const getAllProducts = async (req, res) => {
-  // console.log(req.query)
-  const { category, name, description } = req.query;
+  const { category, name, description, sponsored } = req.query;
   const queryObject = {};
 
   if (category) {
@@ -84,13 +83,21 @@ const getAllProducts = async (req, res) => {
   if (name) {
     queryObject.name = { $regex: name, $options: "i" };
   }
+
   if (description) {
     queryObject.description = { $regex: description, $options: "i" };
   }
-  console.log(queryObject);
+
+  // Add this condition to filter sponsored products
+  if (sponsored !== undefined) {
+    queryObject.sponsored = sponsored === 'true';
+  }
+  
   const products = await Product.find(queryObject);
   res.status(StatusCodes.OK).json({ products, count: products.length });
 };
+
+
 const getSingleProduct = async (req, res) => {
   const { id: productId } = req.params;
   const product = await Product.findOne({ _id: productId });
