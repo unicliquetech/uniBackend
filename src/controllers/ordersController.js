@@ -75,7 +75,6 @@ const createOrder = async (req, res) => {
   // calculate total
   const total = serviceCharge + deliveryFee + subtotal;
   const deliveryAddress = selectedAddress.location.concat(' ', selectedAddress.university, ' ', selectedAddress.city);
-  console.log(deliveryAddress);
 
 
   const order = await Order.create({
@@ -92,114 +91,8 @@ const createOrder = async (req, res) => {
     vendorId,
   });
 
-  // Send WhatsApp notification
-  const orderItemsText = order.orderItems
-    .map((item) => `- ${item.name} (Quantity: ${item.quantity}, Price: ${item.price})`)
-    .join('\n');
-
-  // const notificationMessage = `New Order Received:\n\nOrder Items:\n${orderItemsText}\n\nTotal: ${order.total}\nDelivery Address: ${order.deliveryAddress}`;
-
-  // console.log(vendorWhatsAppNumber);
-  // console.log(notificationMessage);
-  // if (vendorWhatsAppNumber) {
-  //   sendWhatsAppNotification(vendorWhatsAppNumber, notificationMessage);
-  // }
-
-  res.status(StatusCodes.CREATED).json({ order, vendorWhatsAppNumber });
+  res.status(StatusCodes.CREATED).json({ order, vendorWhatsAppNumber, deliveryAddress });
 };
-
-
-
-// const createOrder = async (req, res) => {
-//   const {
-//     items: cartItems,
-//     serviceCharge,
-//     deliveryAddress,
-//     userId,
-//     orderStatus,
-//     shippingFee,
-//     deliveryTime,
-//     vendorWhatsAppNumber,
-//   } = req.body;
-
-//   if (!cartItems || cartItems.length < 1) {
-//     throw new CustomError.BadRequestError('No cart items provided');
-//   }
-
-//   if (!serviceCharge || !shippingFee) {
-//     throw new CustomError.BadRequestError(
-//       'Please provide charges and shipping fee'
-//     );
-//   }
-
-//   let orderItems = [];
-//   let subtotal = 0;
-
-//   for (const item of cartItems) {
-//     const dbProduct = await Product.findOne({ _id: item.product });
-
-//     if (!dbProduct) {
-//       throw new CustomError.NotFoundError(
-//         `No product with id : ${item.product}`
-//       );
-//     }
-
-//     const { name, price, image, _id } = dbProduct;
-//     const SingleOrderItem = {
-//       quantity: item.quantity,
-//       name,
-//       price,
-//       image,
-//       productId: _id,
-//     };
-
-//     // add items to order
-//     orderItems = [...orderItems, SingleOrderItem];
-
-//     // calculate subtotal
-//     subtotal += item.quantity * price;
-//   }
-
-//   // calculate total
-//   const total = serviceCharge + shippingFee + subtotal;
-
-//   const order = await Order.create({
-//     orderItems,
-//     total,
-//     subtotal,
-//     serviceCharge,
-//     shippingFee,
-//     deliveryAddress,
-//     userId,
-//     orderStatus,
-//     deliveryTime,
-//   });
-
-//   // Send WhatsApp notification
-//   const orderItemsText = order.orderItems
-//     .map(
-//       (item) =>
-//         `- ${item.name} (Quantity: ${item.quantity}, Price: ${item.price})`
-//     )
-//     .join('\n');
-
-//   const notificationMessage = `New Order Received:\n\nOrder Items:\n${orderItemsText}\n\nTotal: ${order.total}\nDelivery Address: ${order.deliveryAddress}`;
-
-//   sendWhatsAppNotification(vendorWhatsAppNumber, notificationMessage);
-
-//   res.status(StatusCodes.CREATED).json({ order });
-// };
-
-
-
-
-
-
-
-
-
-
-
 
 
 const getAllOrders = async (req, res) => {
