@@ -3,7 +3,7 @@ const crypto = require('crypto');
 const LocalStorage = require('node-localstorage').LocalStorage;
 const localStorage = new LocalStorage('./cart');
 
-const getNewCartId = () => {
+let getNewCartId = () => {
   return crypto.randomBytes(16).toString('hex');
 };
 
@@ -15,7 +15,7 @@ const getCartItem = async (req, res) => {
   }
 
   try {
-    let cart = await CartData.find({ cartId });
+    let cart = await CartData.findOne({ cartId });
 
     if (!cart) {
       const newCartId = getNewCartId();
@@ -23,8 +23,8 @@ const getCartItem = async (req, res) => {
       await cart.save();
       return res.status(201).json({ cartId: newCartId, items: [] });
     }
-
-    res.json(cart);
+    
+    res.json({ items: cart.items || [] });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Internal server error' });
@@ -53,18 +53,19 @@ const getCart = async (req, res) => {
 };
 
 const addCartItem = async (req, res) => {
-  const { productId, quantity, image, name, price, colors, freeShipping, deliveryTime } = req.body;
+  const { productId, quantity, image, name, price, colors, freeShipping, deliveryTime, cartId } = req.body;
   try {
-    let cartId = localStorage.getItem('cartId');
+    let cart;
+    let newCartId = cartId;
 
-    if (!cartId) {
-      cartId = getNewCartId();
-      localStorage.setItem('cartId', cartId);
-    }
-
-    let cart = await CartData.findOne({ cartId });
-    if (!cart) {
-      cart = new CartData({ cartId, items: [] });
+    if (!newCartId) {
+      newCartId = crypto.randomBytes(16).toString('hex');
+      cart = new CartData({ cartId: newCartId, items: [] });
+    } else {
+      cart = await CartData.findOne({ cartId: newCartId });
+      if (!cart) {
+        cart = new CartData({ cartId: newCartId, items: [] });
+      }
     }
 
     const existingItemIndex = cart.items.findIndex(item => item.productId === productId);
@@ -84,7 +85,7 @@ const addCartItem = async (req, res) => {
     }
 
     await cart.save();
-    res.json(cart.items);
+    res.json(newCartId);
   } catch (err) {
     console.error('Error adding item to cart:', err);
     res.status(500).json({ error: 'An error occurred while adding the item to the cart.' });
@@ -94,8 +95,8 @@ const addCartItem = async (req, res) => {
 const updateCartItem = async (req, res) => {
   try {
     const { productId } = req.params;
-    const { quantity } = req.body;
-    let cartId = localStorage.getItem('cartId');
+    const { quantity, cartId } = req.body;
+
 
     if (!cartId) {
       return res.status(400).json({ error: 'No cart found.' });
@@ -122,9 +123,9 @@ const updateCartItem = async (req, res) => {
 
 const deleteCartItem = async (req, res) => {
   const { productId } = req.params;
+  const { cartId } = req.body;
 
   try {
-    let cartId = localStorage.getItem('cartId');
 
     if (!cartId) {
       return res.status(400).json({ error: 'No cart found.' });
