@@ -59,10 +59,14 @@ const createProduct = async (req, res) => {
       discountPrice,
       refund,
       vendorId,
-      image,
+      image: JSON.parse(image),
       deliveryTime,
       deliveryNote,
     });
+
+    if (typeof newProduct.image === 'string') {
+      newProduct.image = JSON.parse(newProduct.image);
+    }
 
     const savedProduct = await newProduct.save();
     res.status(201).json(savedProduct);
@@ -93,8 +97,18 @@ const getAllProducts = async (req, res) => {
     queryObject.sponsored = sponsored === 'true';
   }
   
-  const products = await Product.find(queryObject);
-  res.status(StatusCodes.OK).json({ products, count: products.length });
+  // const products = await Product.find(queryObject);
+  // res.status(StatusCodes.OK).json({ products, count: products.length });
+
+  const products = await Product.find(queryObject).lean();
+  
+  // Modify the products to include only the first image
+  const modifiedProducts = products.map(product => ({
+    ...product,
+    image: Array.isArray(product.image) ? product.image[0] : product.image
+  }));
+  
+  res.status(StatusCodes.OK).json({ products: modifiedProducts, count: products.length });
 };
 
 
@@ -133,31 +147,81 @@ const deleteProduct = async (req, res) => {
   res.status(StatusCodes.OK).json({ msg: "Success! Product removed." });
 };
 
+// const uploadImage = async (req, res) => {
+//   if (!req.files || Object.keys(req.files).length === 0) {
+//     return res
+//       .status(StatusCodes.BAD_REQUEST)
+//       .json({ error: "No image file provided" });
+//   }
+
+//   // Assuming that the file input field name is 'image'
+//   const file = req.files.image;
+
+//   if (!file) {
+//     return res
+//       .status(StatusCodes.BAD_REQUEST)
+//       .json({ error: "No image file provided" });
+//   }
+
+//   const result = await cloudinary.uploader.upload(file.tempFilePath, {
+//     use_filename: true,
+//     folder: "file-upload",
+//   });
+
+//   // Remove the temporary file from the server
+//   fs.unlinkSync(file.tempFilePath);
+
+//   return res.status(StatusCodes.OK).json({ image: { src: result.secure_url } });
+// };
+
+// const uploadImage = async (req, res) => {
+//   if (!req.files || Object.keys(req.files).length === 0) {
+//     return res
+//       .status(StatusCodes.BAD_REQUEST)
+//       .json({ error: "No image files provided" });
+//   }
+
+//   const files = Array.isArray(req.files.image) ? req.files.image : [req.files.image];
+
+//   const uploadPromises = files.map(file => 
+//     cloudinary.uploader.upload(file.tempFilePath, {
+//       use_filename: true,
+//       folder: "file-upload",
+//     })
+//   );
+
+//   try {
+//     const results = await Promise.all(uploadPromises);
+//     const imageUrls = results.map(result => result.secure_url);
+//     res.status(StatusCodes.OK).json({ imageUrls });
+//   } catch (error) {
+//     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "Image upload failed" });
+//   }
+// };
+
 const uploadImage = async (req, res) => {
   if (!req.files || Object.keys(req.files).length === 0) {
     return res
       .status(StatusCodes.BAD_REQUEST)
-      .json({ error: "No image file provided" });
+      .json({ error: "No image files provided" });
   }
 
-  // Assuming that the file input field name is 'image'
-  const file = req.files.image;
+  try {
+    const uploadPromises = Object.values(req.files).map(file =>
+      cloudinary.uploader.upload(file.tempFilePath, {
+        use_filename: true,
+        folder: "file-upload",
+      })
+    );
 
-  if (!file) {
-    return res
-      .status(StatusCodes.BAD_REQUEST)
-      .json({ error: "No image file provided" });
+    const results = await Promise.all(uploadPromises);
+    const imageUrls = results.map(result => result.secure_url);
+
+    res.status(StatusCodes.OK).json({ images: imageUrls });
+  } catch (error) {
+    console.error('Error uploading images:', error);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "Image upload failed" });
   }
-
-  const result = await cloudinary.uploader.upload(file.tempFilePath, {
-    use_filename: true,
-    folder: "file-upload",
-  });
-
-  // Remove the temporary file from the server
-  fs.unlinkSync(file.tempFilePath);
-
-  return res.status(StatusCodes.OK).json({ image: { src: result.secure_url } });
 };
 
 const getProductsByVendor = async (req, res) => {
