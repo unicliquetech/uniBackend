@@ -113,13 +113,34 @@ const getAllProducts = async (req, res) => {
 
 
 const getSingleProduct = async (req, res) => {
-  const { id: productId } = req.params;
-  const product = await Product.findOne({ _id: productId });
+  try {
+    const { id: productId } = req.params;
+    
+    const product = await Product.findOne({ _id: productId }).populate('vendorId', 'name rating');
+    
+    if (!product) {
+      return res.status(StatusCodes.BAD_REQUEST).json(`No product with id : ${productId}`);
+    }
+    
+    // Extract vendor information
+    const vendorInfo = product.vendorId ? {
+      businessName: product.vendorId.businessName,
+      businessDescription: product.vendorId.businessDescription,
+      rating: product.vendorId.rating
+    } : null;
 
-  if (!product) {
-    return res.status(StatusCodes.BAD_REQUEST).json(`No product with id : ${productId}`);
+
+    // Create a new object with product data and vendor info
+    const responseData = {
+      ...product.toObject(),
+      vendor: vendorInfo
+    };
+
+    res.status(StatusCodes.OK).json({ product: responseData });
+  } catch (error) {
+    console.error("Error in getSingleProduct:", error);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while fetching the product" });
   }
-  res.status(StatusCodes.OK).json({ product });
 };
 
 const updateProduct = async (req, res) => {
@@ -146,58 +167,6 @@ const deleteProduct = async (req, res) => {
 
   res.status(StatusCodes.OK).json({ msg: "Success! Product removed." });
 };
-
-// const uploadImage = async (req, res) => {
-//   if (!req.files || Object.keys(req.files).length === 0) {
-//     return res
-//       .status(StatusCodes.BAD_REQUEST)
-//       .json({ error: "No image file provided" });
-//   }
-
-//   // Assuming that the file input field name is 'image'
-//   const file = req.files.image;
-
-//   if (!file) {
-//     return res
-//       .status(StatusCodes.BAD_REQUEST)
-//       .json({ error: "No image file provided" });
-//   }
-
-//   const result = await cloudinary.uploader.upload(file.tempFilePath, {
-//     use_filename: true,
-//     folder: "file-upload",
-//   });
-
-//   // Remove the temporary file from the server
-//   fs.unlinkSync(file.tempFilePath);
-
-//   return res.status(StatusCodes.OK).json({ image: { src: result.secure_url } });
-// };
-
-// const uploadImage = async (req, res) => {
-//   if (!req.files || Object.keys(req.files).length === 0) {
-//     return res
-//       .status(StatusCodes.BAD_REQUEST)
-//       .json({ error: "No image files provided" });
-//   }
-
-//   const files = Array.isArray(req.files.image) ? req.files.image : [req.files.image];
-
-//   const uploadPromises = files.map(file => 
-//     cloudinary.uploader.upload(file.tempFilePath, {
-//       use_filename: true,
-//       folder: "file-upload",
-//     })
-//   );
-
-//   try {
-//     const results = await Promise.all(uploadPromises);
-//     const imageUrls = results.map(result => result.secure_url);
-//     res.status(StatusCodes.OK).json({ imageUrls });
-//   } catch (error) {
-//     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "Image upload failed" });
-//   }
-// };
 
 const uploadImage = async (req, res) => {
   if (!req.files || Object.keys(req.files).length === 0) {
