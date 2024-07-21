@@ -6,7 +6,7 @@ const path = require("path");
 const cloudinary = require("cloudinary").v2;
 const fs = require("fs");
 const multer = require("multer");
-const upload = multer({ dest: "uploads/" }); 
+const upload = multer({ dest: "uploads/" });
 
 // const createProduct = async (req, res) => {
 //   // req.body.user = req.user.userId;
@@ -37,12 +37,9 @@ const createProduct = async (req, res) => {
       deliveryNote,
     } = req.body;
 
-    console.log(req.body);
-    // Find the vendor based on the userEmail
     const vendor = await Vendor.findOne({ email: vendorEmail });
-    const vendorId = (vendor._id);
+    const vendorId = vendor._id;
 
-    // Assuming you have a Product model
     const newProduct = new Product({
       name,
       description,
@@ -64,7 +61,7 @@ const createProduct = async (req, res) => {
       deliveryNote,
     });
 
-    if (typeof newProduct.image === 'string') {
+    if (typeof newProduct.image === "string") {
       newProduct.image = JSON.parse(newProduct.image);
     }
 
@@ -92,54 +89,77 @@ const getAllProducts = async (req, res) => {
     queryObject.description = { $regex: description, $options: "i" };
   }
 
-  // Add this condition to filter sponsored products
   if (sponsored !== undefined) {
-    queryObject.sponsored = sponsored === 'true';
+    queryObject.sponsored = sponsored === "true";
   }
-  
-  // const products = await Product.find(queryObject);
-  // res.status(StatusCodes.OK).json({ products, count: products.length });
 
-  const products = await Product.find(queryObject).lean();
-  
-  // Modify the products to include only the first image
-  const modifiedProducts = products.map(product => ({
-    ...product,
-    image: Array.isArray(product.image) ? product.image[0] : product.image
-  }));
-  
-  res.status(StatusCodes.OK).json({ products: modifiedProducts, count: products.length });
+  try {
+    const products = await Product.find(queryObject)
+      .populate({
+        path: "vendorId",
+        select: "location businessName businessDescription",
+      })
+      .lean();
+
+    const modifiedProducts = products.map((product) => ({
+      ...product,
+      image: Array.isArray(product.image) ? product.image[0] : product.image,
+      vendorLocation: product.vendorId
+        ? product.vendorId.location
+        : "Unknown location",
+      businessName: product.vendorId
+        ? product.vendorId.businessName
+        : "Uniclique",
+      businessDescription: product.vendorId
+        ? product.vendorId.businessDescription
+        : "Brand Description",
+    }));
+
+    res
+      .status(StatusCodes.OK)
+      .json({ products: modifiedProducts, count: products.length });
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ error: "An error occurred while fetching products" });
+  }
 };
-
 
 const getSingleProduct = async (req, res) => {
   try {
     const { id: productId } = req.params;
-    
-    const product = await Product.findOne({ _id: productId }).populate('vendorId', 'name rating');
-    
+
+    const product = await Product.findOne({ _id: productId })
+      .populate({
+        path: 'vendorId',
+        select: 'location businessName businessDescription'
+      })
+      .lean();
+
     if (!product) {
-      return res.status(StatusCodes.BAD_REQUEST).json(`No product with id : ${productId}`);
+      return res
+        .status(StatusCodes.NOT_FOUND)
+        .json({ error: `No product found with id: ${productId}` });
     }
-    
-    // Extract vendor information
-    const vendorInfo = product.vendorId ? {
-      businessName: product.vendorId.businessName,
-      businessDescription: product.vendorId.businessDescription,
-      rating: product.vendorId.rating
-    } : null;
 
+    const vendorInfo = {
+      vendorLocation: product.vendorId ? product.vendorId.location : "Unknown location",
+      businessName: product.vendorId ? product.vendorId.businessName : "Uniclique",
+      businessDescription: product.vendorId ? product.vendorId.businessDescription : "Brand Description",
+    };
 
-    // Create a new object with product data and vendor info
     const responseData = {
-      ...product.toObject(),
-      vendor: vendorInfo
+      ...product,
+      vendor: vendorInfo,
     };
 
     res.status(StatusCodes.OK).json({ product: responseData });
   } catch (error) {
     console.error("Error in getSingleProduct:", error);
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occurred while fetching the product" });
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ error: "An error occurred while fetching the product" });
   }
 };
 
@@ -151,7 +171,9 @@ const updateProduct = async (req, res) => {
   });
 
   if (!product) {
-    return res.status(StatusCodes.BAD_REQUEST).json(`No product with id : ${productId}`);
+    return res
+      .status(StatusCodes.BAD_REQUEST)
+      .json(`No product with id : ${productId}`);
   }
 
   res.status(StatusCodes.OK).json({ product });
@@ -162,7 +184,9 @@ const deleteProduct = async (req, res) => {
   const product = await Product.findOneAndDelete({ _id: productId });
 
   if (!product) {
-    return res.status(StatusCodes.BAD_REQUEST).json(`No product with id : ${productId}`);
+    return res
+      .status(StatusCodes.BAD_REQUEST)
+      .json(`No product with id : ${productId}`);
   }
 
   res.status(StatusCodes.OK).json({ msg: "Success! Product removed." });
@@ -176,7 +200,7 @@ const uploadImage = async (req, res) => {
   }
 
   try {
-    const uploadPromises = Object.values(req.files).map(file =>
+    const uploadPromises = Object.values(req.files).map((file) =>
       cloudinary.uploader.upload(file.tempFilePath, {
         use_filename: true,
         folder: "file-upload",
@@ -184,34 +208,40 @@ const uploadImage = async (req, res) => {
     );
 
     const results = await Promise.all(uploadPromises);
-    const imageUrls = results.map(result => result.secure_url);
+    const imageUrls = results.map((result) => result.secure_url);
 
     res.status(StatusCodes.OK).json({ images: imageUrls });
   } catch (error) {
-    console.error('Error uploading images:', error);
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "Image upload failed" });
+    console.error("Error uploading images:", error);
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ error: "Image upload failed" });
   }
 };
 
 const getProductsByVendor = async (req, res) => {
-    const vendorEmail  = (req.params.vendorId);
-    const vendor = await Vendor.findOne({ email: vendorEmail });
+  const vendorEmail = req.params.vendorId;
+  const vendor = await Vendor.findOne({ email: vendorEmail });
 
-    if (vendor) {
-      const vendorId = (vendor._id);
-      try {
-        const vendorProducts = await Product.find({ vendorId });
-        res.status(StatusCodes.OK).json({ products: vendorProducts, count: vendorProducts.length });
-      } catch (error) {
-        console.error("Error retrieving products for vendor:", error);
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "Failed to retrieve products for vendor" });
-      }
-    } else {
-      // Handle the case when vendor is not found
-      console.log(`Vendor with email ${vendorEmail} not found`);
-      return res.status(StatusCodes.BAD_REQUEST).json({ error: "No email provided" });
+  if (vendor) {
+    const vendorId = vendor._id;
+    try {
+      const vendorProducts = await Product.find({ vendorId });
+      res
+        .status(StatusCodes.OK)
+        .json({ products: vendorProducts, count: vendorProducts.length });
+    } catch (error) {
+      console.error("Error retrieving products for vendor:", error);
+      res
+        .status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .json({ error: "Failed to retrieve products for vendor" });
     }
-  
+  } else {
+    console.log(`Vendor with email ${vendorEmail} not found`);
+    return res
+      .status(StatusCodes.BAD_REQUEST)
+      .json({ error: "No email provided" });
+  }
 };
 
 module.exports = {

@@ -105,7 +105,6 @@ const vendorSchema = new mongoose.Schema({
   reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Review' }],
 });
 
-// module.exports = mongoose.model("Vendor", vendorSchema);
 const Vendor = mongoose.model('Vendor', vendorSchema);
 
 module.exports = Vendor;
