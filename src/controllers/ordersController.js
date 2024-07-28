@@ -8,7 +8,7 @@ const sendWhatsAppNotification = require('../utils/sendWhatsappNotification');
 
 const createOrder = async (req, res) => {
   const { items: cartItems, serviceCharge, selectedAddress, orderStatus, deliveryFee, userId } = req.body;
-  // console.log(req.body);
+  console.log(req.body);
   const generateOrderId = () => {
     const min = 1000;
     const max = 9999;
@@ -23,10 +23,10 @@ const createOrder = async (req, res) => {
     throw new CustomError.BadRequestError('No cart items provided');
   }
 
-//   console.log(serviceCharge, deliveryFee);
-  if (!serviceCharge || !deliveryFee) {
-    throw new CustomError.BadRequestError('Please provide charges and shipping fee');
-  }
+  // console.log(serviceCharge, deliveryFee);
+  // if (!serviceCharge || !deliveryFee) {
+  //   throw new CustomError.BadRequestError('Please provide charges and delivery fee');
+  // }
 
   let orderItems = [];
   let subtotal = 0;
@@ -46,7 +46,6 @@ const createOrder = async (req, res) => {
 
     const { name, price, image, _id, vendorId: itemVendorId, deliveryTime: itemDeliveryTime } = dbProduct;
     const vendorIdString = itemVendorId.toString();
-    console.log(vendorIdString);
     const vendorUser = await Vendor.findById(vendorIdString);
 
     if (!vendorUser) {
@@ -58,7 +57,7 @@ const createOrder = async (req, res) => {
       quantity: item.quantity,
       name,
       price,
-      image,
+      image: Array.isArray(image) ? image[0] : image,
       productId: _id,
     };
 

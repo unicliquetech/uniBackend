@@ -24,6 +24,7 @@ const getCartItem = async (req, res) => {
       return res.status(201).json({ cartId: newCartId, items: [] });
     }
     
+    console.log(cart);
     res.json({ items: cart.items || [] });
   } catch (err) {
     console.error(err);
