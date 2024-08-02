@@ -113,6 +113,9 @@ const getAllProducts = async (req, res) => {
       businessDescription: product.vendorId
         ? product.vendorId.businessDescription
         : "Brand Description",
+      phoneNumber: product.vendorId 
+      ? product.vendorId.phoneNumber 
+      : "Null",
     }));
 
     res
@@ -133,7 +136,7 @@ const getSingleProduct = async (req, res) => {
     const product = await Product.findOne({ _id: productId })
       .populate({
         path: 'vendorId',
-        select: 'location businessName businessDescription'
+        select: 'location businessName businessDescription phoneNumber'
       })
       .lean();
 
@@ -147,6 +150,7 @@ const getSingleProduct = async (req, res) => {
       vendorLocation: product.vendorId ? product.vendorId.location : "Unknown location",
       businessName: product.vendorId ? product.vendorId.businessName : "Uniclique",
       businessDescription: product.vendorId ? product.vendorId.businessDescription : "Brand Description",
+      phoneNumber: product.vendorId ? product.vendorId.phoneNumber : "Null",
     };
 
     const responseData = {
