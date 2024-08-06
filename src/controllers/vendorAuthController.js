@@ -179,8 +179,12 @@ const vendorRegister = async (req, res) => {
       }
   
       // Compare the provided password with the hashed password
-      const isPasswordValid = await bcrypt.compare(password, vendor.password);
+      // const isPasswordValid = await bcrypt.compare(password, vendor.password);
   
+      // if (!isPasswordValid) {
+      //   return res.status(400).json({ error: 'Invalid credentials' });
+      // }
+
       if (vendor.password !== password) {
         return res.status(400).json({ error: 'Invalid credentials' });
       }
@@ -188,7 +192,11 @@ const vendorRegister = async (req, res) => {
       // Generate a JWT token
       const token = jwt.sign({ vendorId: vendor._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
   
-      res.json({ msg: `Welcome back, ${vendor.ownerName}`, token });
+      res.json({
+        msg: `Welcome back, ${vendor.ownerName}`,
+        token,
+        vendorEmail: vendor.email
+      });
     } catch (error) {
       console.error('Error logging in vendor:', error);
       res.status(500).json({ error: 'An error occurred' });
