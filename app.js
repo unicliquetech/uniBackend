@@ -37,7 +37,7 @@ cloudinary.config({
 const app = express();
 app.use(express.json());
 
-const allowedOrigins = ['http://localhost:3000', 'https://uniclique.com.ng'];
+const allowedOrigins = ['http://localhost:3000', 'https://uniclique.com.ng', 'http://localhost:8080'];
 
 app.use(cors({
   origin: allowedOrigins
