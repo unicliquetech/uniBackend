@@ -170,34 +170,36 @@ const getSingleProduct = async (req, res) => {
 const updateProduct = async (req, res) => {
   const { id: productId } = req.params;
   
-  // First get the current product to preserve the image
-  const currentProduct = await Product.findOne({ _id: productId });
-  
-  if (!currentProduct) {
-    return res
-      .status(StatusCodes.BAD_REQUEST)
-      .json(`No product with id : ${productId}`);
-  }
-  
-  // Create update data from req.body but preserve the original image
-  const updateData = { ...req.body };
-  
-  // If the request doesn't include a new image, keep the original
-  if (!req.body.image) {
-    updateData.image = currentProduct.image;
-  }
-  
-  // Update the product with the modified data
-  const product = await Product.findOneAndUpdate(
-    { _id: productId },
-    updateData,
-    {
-      new: true,
-      runValidators: true,
+  try {
+    // First get the current product
+    const currentProduct = await Product.findOne({ _id: productId });
+    
+    if (!currentProduct) {
+      return res
+        .status(StatusCodes.NOT_FOUND)
+        .json({ error: `No product with id : ${productId}` });
     }
-  );
-  
-  res.status(StatusCodes.OK).json({ product });
+    
+    // Create update data from req.body
+    const updateData = { ...req.body };
+    
+    // Always use the original image from the database
+    updateData.image = currentProduct.image;
+    
+    // Update the product with the original image preserved
+    const product = await Product.findOneAndUpdate(
+      { _id: productId },
+      updateData,
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+    
+    res.status(StatusCodes.OK).json({ product });
+  } catch (error) {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
+  }
 };
 
 const deleteProduct = async (req, res) => {
